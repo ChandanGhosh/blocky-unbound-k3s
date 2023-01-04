@@ -1,0 +1,126 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  unbound
+  labels:
+    app:  unbound
+    namespace: unbound
+spec:
+  selector:
+    matchLabels:
+      app: unbound
+  replicas: 1 
+  template:
+    metadata:
+      labels:
+        app:  unbound
+    spec:
+      # initContainers:
+      # - name: unbound-ads-conf
+      #   image: alpine
+      #   imagePullPolicy: IfNotPresent
+      #   command: ["sh", "-c", "cd /unbound-ads && apk update && apk add ca-certificates && apk add wget && wget 'https://pgl.yoyo.org/adservers/serverlist.php?hostformat=unbound&showintro=0&mimetype=plaintext&useip=127.0.0.1' -O unbound-ad-servers" ]
+      #   volumeMounts:
+      #     - name: unbound-ads-conf-volume
+      #       mountPath: /unbound-ads
+      #
+      containers:
+      - name:  unbound
+        image:  mvance/unbound
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "250m"
+        ports:
+        - name: svc-53-udp
+          containerPort: 53
+          protocol: UDP
+        - name: svc-53-tcp
+          containerPort: 53
+          protocol: TCP
+        volumeMounts:
+          - name: unbound-main-conf-volume
+            mountPath: /opt/unbound/etc/unbound/unbound.conf
+            subPath: unbound.conf
+          # - name: unbound-ads-conf-volume
+          #   mountPath: /unbound-ads
+          - name: unbound-a-conf-volume
+            mountPath: /opt/unbound/etc/unbound/a-records.conf
+            subPath: a-records.conf
+          - name: unbound-forward-conf-volume
+            mountPath: /opt/unbound/etc/unbound/forward-records.conf
+            subPath: forward-records.conf
+          - name: unbound-srv-conf-volume
+            mountPath: /opt/unbound/etc/unbound/srv-records.conf
+            subPath: srv-records.conf
+      restartPolicy: Always
+      volumes:
+        - name: unbound-main-conf-volume
+          configMap:
+            name: unbound-main-conf
+        # - name: unbound-ads-conf-volume
+        #   emptyDir: {}
+        - name: unbound-a-conf-volume
+          configMap:
+            name: unbound-a-records-conf
+        - name: unbound-forward-conf-volume
+          configMap:
+            name: unbound-forward-records-conf
+        - name: unbound-srv-conf-volume
+          configMap:
+            name: unbound-srv-records-conf
+---
+
+---
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: unbound
+  namespace: unbound
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: unbound
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 20
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: AverageValue
+        averageValue: 100Mi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: unbound-svc
+  namespace: unbound
+spec:
+  selector:
+    app: unbound
+  ports:
+  - name: tcp-svc
+    protocol: TCP
+    port: 53
+    targetPort: 53
+  - name: udp-svc
+    protocol: UDP
+    port: 53
+    targetPort: 53
+  # externalIPs:
+  # - 10.27.27.119
+  # - 10.27.27.120
+---
+
