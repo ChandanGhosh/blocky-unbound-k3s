@@ -13,7 +13,8 @@ data:
       log-replies: yes
       log-servfail: yes
       use-syslog: no
-      logfile: /dev/stdout
+      logfile: ""
+      log-time-ascii: yes
 
 
       num-threads: 2
@@ -58,9 +59,8 @@ data:
       access-control: ::1/128 allow
 
 
-      logfile: ""
-      use-syslog: no
-      log-time-ascii: yes
+
+
       root-hints: /etc/unbound/root.hints
       hide-identity: yes
       hide-version: yes
