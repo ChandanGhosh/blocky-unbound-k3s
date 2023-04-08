@@ -1,6 +1,6 @@
 # unbound-blocky-k3s
 Blocky and unbound duo with pod scaling using HPA on K3s cluster for ads blocking in home.
-You can only use unbound which has built-in support for DNS based ad blocking. If you prefer a sophisticated ad blocker and your own recusive DNS server, you can go for Blocky with unbound as well.
+You can use only unbound which has built-in support for DNS based ad blocking. If you prefer a sophisticated ad blocker and your own recursive DNS server, you can go for Blocky with unbound as well.
 
 # Setup K3S
 Follow the official [guide](https://docs.k3s.io/quick-start)
