@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: unbound
-  replicas: 1 
+  replicas: 1
   template:
     metadata:
       labels:
@@ -44,14 +44,14 @@ spec:
             mountPath: /etc/unbound/unbound.conf
             subPath: unbound.conf
           - name: unbound-a-conf-volume
-            mountPath: /etc/unbound/unbound.conf
+            mountPath: /etc/unbound/a-records.conf
             subPath: a-records.conf
           - name: unbound-forward-conf-volume
             mountPath: /etc/unbound/forward-records.conf
             subPath: forward-records.conf
-          # - name: unbound-srv-conf-volume
-          #   mountPath: /opt/unbound/etc/unbound/srv-records.conf
-          #   subPath: srv-records.conf
+          - name: unbound-srv-conf-volume
+            mountPath: /opt/unbound/etc/unbound/srv-records.conf
+            subPath: srv-records.conf
       restartPolicy: Always
       volumes:
         - name: unbound-main-conf-volume
