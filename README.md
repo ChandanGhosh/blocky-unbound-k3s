@@ -10,7 +10,7 @@ Follow the official [guide](https://docs.k3s.io/quick-start)
 This Unbound image has inbuild DNS based ad blocking support.
 ```
 kubectl create ns unbound
-kubectl apply -f unbound-conf.yaml -f unbound.yaml
+kubectl apply -f unbound-conf.yaml -f unbound.yaml -n unbound
 ```
 
 # Install blocky (Optional)
